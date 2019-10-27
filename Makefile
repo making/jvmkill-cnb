@@ -6,7 +6,7 @@
 
 SHELL=/bin/bash -o pipefail
 
-VERSION := "v$$(cat buildpack.toml | grep '^version' | head -1 | sed -e 's/version = //g' | xargs)"
+VERSION := "$$(cat buildpack.toml | grep '^version' | head -1 | sed -e 's/version = //g' | xargs)"
 
 clean:
 	rm -fr vendor jvmkill-cnb-$(VERSION).tgz
