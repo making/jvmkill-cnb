@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+echo "---> JVMKill Agent Buildpack"
+
+layersdir=$1
+buildpack_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+vendor_dir=${buildpack_dir}/vendor
+
+jvmkilllayer="$layersdir"/jvmkill
+mkdir -p ${jvmkilllayer}/profile.d
+
+local_checksum=$(sha256sum $(ls ${vendor_dir}/jvmkill*.so 2>/dev/null | head -1) | cut -d ' ' -f 1 || echo 'not found')
+remote_checksum=$(cat "$jvmkilllayer.toml" 2>/dev/null | grep metadata  | tr -d '"' | sed 's/metadata = //' || echo 'not found')
+
+if [[ "${local_checksum}" == "${remote_checksum}" ]] ; then
+  echo "---> Resuing JVMKill Agent"
+else
+  echo "---> Installing JVMKill Agent"
+  cp ${vendor_dir}/jvmkill* ${jvmkilllayer}
+  echo "JVMKILL_PARAMS=\${BPL_JVMKILL_PARAMS:-printHeapHistogram=1}" >> ${jvmkilllayer}/profile.d/jvmkill
+  echo "export JAVA_OPTS=\"\${JAVA_OPTS} -agentpath:$(ls ${jvmkilllayer}/jvmkill*.so | head -1)=\${JVMKILL_PARAMS}\"" >> ${jvmkilllayer}/profile.d/jvmkill
+fi
+
+cat <<EOF > $jvmkilllayer.toml
+cache = true
+launch = true
+metadata = "${local_checksum}"
+EOF

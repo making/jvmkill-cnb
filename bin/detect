@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+if [ -v BP_DISABLE_JVMKILL ];then
+  exit 100
+fi
+
+plan=$2
+
+cat <<EOF > "$plan"
+EOF
