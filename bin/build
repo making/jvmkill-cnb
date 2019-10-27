@@ -14,7 +14,7 @@ local_checksum=$(sha256sum $(ls ${vendor_dir}/jvmkill*.so 2>/dev/null | head -1)
 remote_checksum=$(cat "$jvmkilllayer.toml" 2>/dev/null | grep metadata  | tr -d '"' | sed 's/metadata = //' || echo 'not found')
 
 if [[ "${local_checksum}" == "${remote_checksum}" ]] ; then
-  echo "---> Resuing JVMKill Agent"
+  echo "---> Resuing cached layer"
 else
   echo "---> Installing JVMKill Agent"
   cp ${vendor_dir}/jvmkill* ${jvmkilllayer}
