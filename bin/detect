@@ -8,4 +8,6 @@ fi
 plan=$2
 
 cat <<EOF > "$plan"
+[[requires]]
+  name = "jvm-application"
 EOF
